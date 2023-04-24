@@ -3,49 +3,49 @@ const productos = [
   {
     id: 1,
     img: "img/6-diseños-alma/diseño-alma1.jpg",
-    descripcion: "Vasito de Cristal1",
-    precio: 11.25,
+    descripcion: "Vasito de Cristal",
+    precio: 10.25,
   },
   {
     id: 2,
     img: "img/6-diseños-alma/diseño-alma2.jpg",
-    descripcion: "Vasito de Cristal2",
-    precio: 8.75,
+    descripcion: "Vasito de Cristal",
+    precio: 10.0,
   },
   {
     id: 3,
-    img: "img/6-diseños-alma/diseño-alma3.jpg",
-    descripcion: "Vasito de Cristal3",
-    precio: 9.5,
+    img: "img/6-diseños-alma/diseño-alma7.jpg",
+    descripcion: "Vasito de Cristal",
+    precio: 10.0,
   },
   {
     id: 4,
-    img: "img/6-diseños-alma/diseño-alma4.jpg",
-    descripcion: "Vasito de Cristal4",
+    img: "img/6-diseños-alma/diseño-alma7.jpg",
+    descripcion: "Vasito de Cristal",
     precio: 10.0,
   },
   {
     id: 5,
     img: "img/6-diseños-alma/diseño-alma5.jpg",
-    descripcion: "Vasito de Cristal5",
+    descripcion: "Vasito de Cristal",
     precio: 10.0,
   },
   {
     id: 6,
     img: "img/6-diseños-alma/diseño-alma6.jpg",
-    descripcion: "Vasito de Cristal6",
+    descripcion: "Vasito de Cristal",
     precio: 10.0,
   },
   {
     id: 7,
-    img: "img/6-diseños-alma/diseño-alma7.jpg",
-    descripcion: "Vasito de Cristal7",
+    img: "img/6-diseños-alma/diseño-alma3.jpg",
+    descripcion: "Vasito de Cristal",
     precio: 10.0,
   },
   {
     id: 8,
-    img: "img/6-diseños-alma/diseño-alma8.jpg",
-    descripcion: "Vasito de Cristal8",
+    img: "img/6-diseños-alma/diseño-alma11.jpg",
+    descripcion: "Vasito de Cristal",
     precio: 10.0,
   },
 ];
@@ -74,7 +74,8 @@ document.addEventListener("DOMContentLoaded", () => {
       carrito.style.marginRight = "-100%";
       carrito.style.opacity = "0";
 
-      items.style.width = "100%";
+      //items.style.width = "100%";
+      items.classList.remove("items-width");
     }
   }
 
@@ -82,9 +83,22 @@ document.addEventListener("DOMContentLoaded", () => {
   function sumarCantidad(event) {
     const buttonClicked = event.target;
     const selector = buttonClicked.parentElement;
-    let cantidadActual = selector.querySelector(".carrito-item-cantidad").value;
+
+    let cantidadActual = parseInt(
+      selector.querySelector(".carrito-item-cantidad").value
+    );
+    const id =
+      selector.parentElement.querySelector(".carrito-item-id").textContent;
+    const itemSeleccionado = productos.find((producto) => producto.id == id);
+    const { precio } = itemSeleccionado;
+
     cantidadActual++;
     selector.querySelector(".carrito-item-cantidad").value = cantidadActual;
+
+    const precioActual = precio * cantidadActual;
+    selector.parentElement.querySelector(".carrito-item-precio").textContent =
+      precioActual.toFixed(2);
+
     actualizarTotalCarrito();
   }
 
@@ -92,10 +106,19 @@ document.addEventListener("DOMContentLoaded", () => {
   function restarCantidad(event) {
     const buttonClicked = event.target;
     const selector = buttonClicked.parentElement;
-    let cantidadActual = selector.querySelector(".carrito-item-cantidad").value;
+    let cantidadActual = parseInt(
+      selector.querySelector(".carrito-item-cantidad").value
+    );
+    const id =
+      selector.parentElement.querySelector(".carrito-item-id").textContent;
+    const itemSeleccionado = productos.find((producto) => producto.id == id);
+    const { precio } = itemSeleccionado;
     cantidadActual--;
     if (cantidadActual >= 1) {
       selector.querySelector(".carrito-item-cantidad").value = cantidadActual;
+      const precioActual = precio * cantidadActual;
+      selector.parentElement.querySelector(".carrito-item-precio").textContent =
+        precioActual.toFixed(2);
       actualizarTotalCarrito();
     }
   }
@@ -105,7 +128,19 @@ document.addEventListener("DOMContentLoaded", () => {
     carrito.style.marginRight = "0";
     carrito.style.opacity = "1";
 
-    items.style.width = "60%";
+    items.classList.add("items-width");
+    //items.style.width = "60%";
+  }
+
+  //Función que hace scroll hasta el carrito en versión movil.
+  function scrollToCart() {
+    const carritoElement = document.querySelector("#carrito");
+    carritoElement.scrollIntoView({ behavior: "smooth" });
+  }
+
+  //Función para comprobar que estamos en versión movil
+  function isMobile() {
+    return /Android|webOS|iPhone|iPad/i.test(navigator.userAgent);
   }
 
   //Funcion que controla el boton clickado de agragar al carrito.
@@ -117,6 +152,9 @@ document.addEventListener("DOMContentLoaded", () => {
     const productoSeleccionado = productos.find((element) => element.id == id);
     agregarItemAlCarrito(productoSeleccionado);
     hacerVisibleCarrito();
+    if (isMobile()) {
+      scrollToCart();
+    }
   }
 
   //Funcion que agrega un items al carrito
@@ -148,7 +186,9 @@ document.addEventListener("DOMContentLoaded", () => {
                     <input type="text" value="1" class="carrito-item-cantidad" disabled>
                     <i class="fa-solid fa-plus sumar-cantidad"></i>
                 </div>
-                <span class="carrito-item-precio">${precio}</span>
+                <span class="carrito-item-precio">${Number.parseFloat(
+                  precio
+                ).toFixed(2)} €</span>
             </div>
             <button class="btn-eliminar">
                 <i class="fa-solid fa-trash"></i>
@@ -193,23 +233,30 @@ document.addEventListener("DOMContentLoaded", () => {
 
   //Actualizamos el total del carrito
   function actualizarTotalCarrito() {
+    let subTotal = 0;
+    let descuento = 0;
     const carritoItems = document.querySelectorAll(".carrito-item");
 
-    let total = 0;
-
     carritoItems.forEach((item) => {
-      const precioElemento = item.querySelector(
-        ".carrito-item-precio"
-      ).textContent;
-      const precio = Number.parseFloat(precioElemento).toFixed(2);
+      const precioElemento = Number.parseFloat(
+        item.querySelector(".carrito-item-precio").textContent
+      );
 
-      const cantidadItem = item.querySelector(".carrito-item-cantidad");
-      const cantidad = cantidadItem.value;
-      total += precio * cantidad;
+      subTotal += precioElemento;
+      descuento += precioElemento * 0.1;
     });
 
+    const gastosEnvio = 1.99;
+    const totalConDescuento = subTotal - descuento;
+
+    document.querySelector(".carrito-precio-subtotal").textContent =
+      Number.parseFloat(subTotal).toFixed(2) + " €";
+    document.querySelector(".carrito-precio-descuento").textContent =
+      Number.parseFloat(descuento * -1).toFixed(2) + " €";
+    document.querySelector(".carrito-precio-gastos").textContent =
+      Number.parseFloat(gastosEnvio).toFixed(2) + " €";
     document.querySelector(".carrito-precio-total").textContent =
-      Number.parseFloat(total).toFixed(2) + " €";
+      Number.parseFloat(totalConDescuento + gastosEnvio).toFixed(2) + " €";
   }
 
   //Funcion para renderizar los productos de la base de datos.
