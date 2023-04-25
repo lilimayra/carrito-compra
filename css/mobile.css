@@ -77,15 +77,13 @@ img {
 
 .header__logo {
   width: 6rem;
+  margin: 0 auto;
 }
 
 .header__open {
   width: 2.5rem;
 }
 
-.header__carrito {
-  width: 1.8rem;
-}
 
 .header__close {
   width: 1.6rem;
@@ -121,11 +119,15 @@ img {
 }
 
 .header .nav>*:nth-child(1) {
+  grid-row: 1;
+  grid-column: 1;
   -ms-grid-row: 1;
   -ms-grid-column: 1;
 }
 
 .header .nav>*:nth-child(2) {
+  grid-row: 2;
+  grid-column: 1;
   -ms-grid-row: 2;
   -ms-grid-column: 1;
 }
