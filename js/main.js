@@ -60,11 +60,8 @@ document.addEventListener("DOMContentLoaded", () => {
   function eliminarItemCarrito(event) {
     const buttonClicked = event.target;
     buttonClicked.parentElement.parentElement.remove();
-    //Actualizamos el total del carrito
-    actualizarTotalCarrito();
 
-    //la siguiente función controla si hay elementos en el carrito
-    //Si no hay elimino el carrito
+    actualizarTotalCarrito();
     ocultarCarrito();
   }
 
@@ -73,13 +70,18 @@ document.addEventListener("DOMContentLoaded", () => {
     if (carritoItems.childElementCount == 0) {
       carrito.style.marginRight = "-100%";
       carrito.style.opacity = "0";
-
-      //items.style.width = "100%";
       items.classList.remove("items-width");
     }
   }
 
-  //Aumento en uno la cantidad del elemento seleccionado
+  //Funcion que hace visible carrito
+  function hacerVisibleCarrito() {
+    carrito.style.marginRight = "0";
+    carrito.style.opacity = "1";
+    items.classList.add("items-width");
+  }
+
+  //Cuando se pulsa el boton "+" se aumenta la cantidad del producto seleccionado
   function sumarCantidad(event) {
     const buttonClicked = event.target;
     const selector = buttonClicked.parentElement;
@@ -102,7 +104,7 @@ document.addEventListener("DOMContentLoaded", () => {
     actualizarTotalCarrito();
   }
 
-  //Resto en uno la cantidad del elemento seleccionado
+  //Cuando se pulsa el boton "-" se reduce la cantidad del producto seleccionado
   function restarCantidad(event) {
     const buttonClicked = event.target;
     const selector = buttonClicked.parentElement;
@@ -123,15 +125,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  //Funcion que hace visible carrito
-  function hacerVisibleCarrito() {
-    carrito.style.marginRight = "0";
-    carrito.style.opacity = "1";
-
-    items.classList.add("items-width");
-    //items.style.width = "60%";
-  }
-
   //Función que hace scroll hasta el carrito en versión movil.
   function scrollToCart() {
     const carritoElement = document.querySelector("#carrito");
@@ -143,33 +136,38 @@ document.addEventListener("DOMContentLoaded", () => {
     return /Android|webOS|iPhone|iPad/i.test(navigator.userAgent);
   }
 
-  //Funcion que controla el boton clickado de agragar al carrito.
+  //Funcion que captura el producto seleccionado.
   function addToCartClicked(event) {
     const buttonClicked = event.target;
     const item = buttonClicked.parentNode;
     const idElement = item.querySelector(".id-item");
     const id = idElement.textContent;
     const productoSeleccionado = productos.find((element) => element.id == id);
+
     agregarItemAlCarrito(productoSeleccionado);
+
     hacerVisibleCarrito();
+
     if (isMobile()) {
       scrollToCart();
     }
   }
 
-  //Funcion que agrega un items al carrito
-  function agregarItemAlCarrito({ id, descripcion, precio, img }) {
-    const item = document.createElement("div");
-    item.classList.add("item");
-
-    //Controlamos que el items que se intenta añadir no se encuentre ya en el carrito.
-
+  //Funcion que comprueba si un producto ya se ha añadido al carrito
+  function checkIfItemExists(id) {
     const idsItemsCarrito = Array.from(
       carritoItems.querySelectorAll(".carrito-item-id")
     );
-    const itemYaAgregado = idsItemsCarrito.find(
-      (itemId) => itemId.textContent == id
-    );
+    const existe = idsItemsCarrito.find((itemId) => itemId.textContent == id);
+    return existe;
+  }
+
+  //Funcion que agrega la info del producto seleccionado al carrito desde la base de datos
+  function agregarItemAlCarrito(productoSeleccionado) {
+    const { id, descripcion, precio, img } = productoSeleccionado;
+
+    //Se comprueba que el producto añadido no exista en el carrito
+    const itemYaAgregado = checkIfItemExists(id);
     if (itemYaAgregado) {
       alert("El producto ya se encuentra en el carrito");
       return;
@@ -196,6 +194,8 @@ document.addEventListener("DOMContentLoaded", () => {
         </div>
     `;
 
+    const item = document.createElement("div");
+    item.classList.add("item");
     item.innerHTML = itemCarritoContenido;
     carritoItems.append(item);
 
@@ -241,7 +241,6 @@ document.addEventListener("DOMContentLoaded", () => {
       const precioElemento = Number.parseFloat(
         item.querySelector(".carrito-item-precio").textContent
       );
-
       subTotal += precioElemento;
       descuento += precioElemento * 0.1;
     });
