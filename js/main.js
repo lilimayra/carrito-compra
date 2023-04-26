@@ -1,3 +1,4 @@
+//Variables
 //Simulamos respuesta de una base de datos con los productos.
 const productos = [
   {
@@ -55,6 +56,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const carritoItems = document.querySelector(".carrito-items");
   const carrito = document.querySelector(".carrito");
   const items = document.querySelector(".contenedor-items");
+
+  //Funciones
 
   //Función para eliminar un item del carrito.
   function eliminarItemCarrito(event) {
@@ -330,6 +333,8 @@ document.addEventListener("DOMContentLoaded", () => {
       .querySelector(".btn-pagar")
       .addEventListener("click", pagarClicked);
   }
+
+  //Inicio
 
   renderItems();
   funcionalidadBotonesCarrito();
