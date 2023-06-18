@@ -1,4 +1,4 @@
-## Proyecto final JavaScrip
+## Proyecto final JavaScript
 
 ### Carrito de Compra
 
